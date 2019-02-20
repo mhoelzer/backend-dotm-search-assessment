@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=logo.jpg/>
+</p>
+
 # DOTM search
 
 ## Skills Required
