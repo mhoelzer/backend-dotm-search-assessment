@@ -17,7 +17,7 @@ import sys
 
 def main(directory, text_to_search):
     """
-    searching and printing counts and matching text
+    searching and printing only the counts and matching text
     because we have to follow the rules like nerds
     """
     # os listdir to get outer then go in for .m
@@ -43,26 +43,27 @@ def main(directory, text_to_search):
                 full_path))
             continue
         with zipfile.ZipFile(full_path, "r") as zipped_file:
-            toc = zipped_file.namelist()
-            if "word/document.xml" in toc:
+            table_of_contents = zipped_file.namelist()
+            if "word/document.xml" in table_of_contents:
                 with zipped_file.open("word/document.xml", "r") as opened_file:
                     for line in opened_file:
-                        if text_to_search in line:
+                        # if text_to_search in line:
+                        #     print("Match found in file {}".format(full_path))
+                        index_num = line.find(text_to_search)
+                        if index_num >= 0:
                             files_matched += 1
-                            print("Match found in file {}".format(files_matched))
-                            index = line.find(text_to_search)
-                            if index >= 0:
-                                # check for limits on  l and r
-                                left = index - 40
-                                right = index + 40
-                                sliced_line = line[left:right]
-                                print("   ...{}...".format(sliced_line))
+                            print("Match found in file {}".format(full_path))
+                            # check for limits on  l and r
+                            sliced_line = line[index_num - 40:index_num + 40]
+                            print("   ...{}...".format(sliced_line))
     print("Total dotm files searched: {}".format(files_searched))
     print("Total dotm files matched: {}".format(files_matched))
 
 
+# having this separate frorm the if name... makes things easier to test
 def create_parser():
     parser = argparse.ArgumentParser(description="Process files to find dotm")
+    # ^^^ gives us the parser obj
     parser.add_argument("--dir", help="directory for searching",
                         default=".")  # . means current dir
     parser.add_argument("text_to_search", help="text for searching")
@@ -77,4 +78,5 @@ if __name__ == "__main__":
         exit(1)
     namespace = parser.parse_args()
     main(namespace.dir, namespace.text_to_search)
+    # ^^^ this is accessed by how we named/defined it in the .add_arg
     # main("--dir", "$")  # simple test
