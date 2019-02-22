@@ -30,32 +30,35 @@ def main(directory, text_to_search):
     print("Searching directory {} for text \"{}\" ...".format(
         directory, text_to_search))
     for file in file_list:
-        files_searched += 1
-        full_path = os.path.join(directory, file)  # join dir and file names
-        # is it a dotm?
-        if not full_path.endswith(".dotm"):
-            print("File is not .dotm: {}. Do you not understand the point of this code?".format(
-                full_path))
-            continue
-        # is it a zip?
-        if not zipfile.is_zipfile(full_path):
-            print("File is not zip: {}. Do you not understand the point of this code?".format(
-                full_path))
-            continue
-        with zipfile.ZipFile(full_path, "r") as zipped_file:
-            table_of_contents = zipped_file.namelist()
-            if "word/document.xml" in table_of_contents:
-                with zipped_file.open("word/document.xml", "r") as opened_file:
-                    for line in opened_file:
-                        # if text_to_search in line:
-                        #     print("Match found in file {}".format(full_path))
-                        index_num = line.find(text_to_search)
-                        if index_num >= 0:
-                            files_matched += 1
-                            print("Match found in file {}".format(full_path))
-                            # check for limits on  l and r
-                            sliced_line = line[index_num - 40:index_num + 40]
-                            print("   ...{}...".format(sliced_line))
+        if file.endswith(".dotm"):
+            files_searched += 1
+            # join dir and file names
+            full_path = os.path.join(directory, file)
+            # is it a dotm?
+            if not full_path.endswith(".dotm"):
+                print("File is not .dotm: {}. Do you not understand the point of this code?".format(
+                    full_path))
+                continue
+            # is it a zip?
+            if not zipfile.is_zipfile(full_path):
+                print("File is not zip: {}. Do you not understand the point of this code?".format(
+                    full_path))
+                continue
+            with zipfile.ZipFile(full_path, "r") as zipped_file:
+                table_of_contents = zipped_file.namelist()
+                if "word/document.xml" in table_of_contents:
+                    with zipped_file.open("word/document.xml", "r") as opened_file:
+                        for line in opened_file:
+                            # if text_to_search in line:
+                            #     print("Match found in file {}".format(full_path))
+                            index_num = line.find(text_to_search)
+                            if index_num >= 0 and index_num in range(len(line)):
+                                files_matched += 1
+                                print("Match found in file {}".format(full_path))
+                                # check for limits on  l and r
+                                sliced_line = line[index_num -
+                                                   40:index_num + 40]
+                                print("   ...{}...".format(sliced_line))
     print("Total dotm files searched: {}".format(files_searched))
     print("Total dotm files matched: {}".format(files_matched))
 
